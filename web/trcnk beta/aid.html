@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16位随机设备码生成器</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#1a1a1a;color:#eee;text-align:center;padding:50px;}
+        .box{max-width:450px;margin:0 auto;background:#2d2d2d;padding:30px;border-radius:12px;}
+        h2{margin-bottom:25px;color:#409eff;}
+        #code{
+            width:100%;
+            padding:14px;
+            font-size:20px;
+            letter-spacing:2px;
+            background:#111;
+            border:1px solid #444;
+            color:#67c23a;
+            border-radius:6px;
+            margin-bottom:20px;
+        }
+        button{
+            padding:10px 20px;
+            margin:0 8px;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:15px;
+        }
+        .btn1{background:#409eff;color:#fff;}
+        .btn2{background:#67c23a;color:#fff;}
+        .tip{margin-top:25px;color:#aaa;font-size:14px;line-height:1.8;}
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>16位 AndroidID 生成器</h2>
+        <input type="text" id="code" readonly>
+        <div>
+            <button class="btn1" onclick="createCode()">随机生成</button>
+            <button class="btn2" onclick="copyCode()">一键复制</button>
+        </div>
+        <div class="tip">
+            ADB修改指令：<br>
+            adb shell settings put secure android_id 【生成值】<br><br>
+            还原原始设备码：<br>
+            adb shell settings delete secure android_id
+        </div>
+    </div>
+
+    <script>
+        // 字符集：小写字母 + 数字
+        const chars = 'abcdef0123456789';
+        const len = 16;
+
+        // 生成16位随机串
+        function createCode(){
+            let res = '';
+            for(let i=0;i<len;i++){
+                let idx = Math.floor(Math.random() * chars.length);
+                res += chars[idx];
+            }
+            document.getElementById('code').value = res;
+        }
+
+        // 复制
+        function copyCode(){
+            const val = document.getElementById('code');
+            val.select();
+            document.execCommand('copy');
+            alert('复制成功！');
+        }
+
+        // 页面自动生成第一个
+        window.onload = createCode;
+    </script>
+</body>
+</html>
