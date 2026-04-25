@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>蓝绿渐变背景</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  /* 纯蓝到绿 顺滑渐变 + 流动动画 */
+  background: linear-gradient(-45deg, #0066ff, #0099ff, #00cc88, #00dd66);
+  background-size: 400% 400%;
+  animation: bgFlow 12s ease infinite;
+}
+
+@keyframes bgFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+</style>
+</head>
+<body>
+</body>
+</html>
