@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID生成器</title>
+</head>
+<body>
+    <h3>UUID 生成器</h3>
+    <div>
+        <input type="text" id="uuidOutput" style="width: 400px; font-family: monospace;" readonly>
+        <button id="copyBtn">复制</button>
+        <button id="genBtn">生成新UUID</button>
+    </div>
+    <div style="margin-top: 12px;">
+        <label>批量生成数量: 
+            <input type="number" id="batchCount" min="1" max="100" value="" style="width: 60px;">
+        </label>
+        <button id="batchGenBtn">批量生成</button>
+    </div>
+    <div style="margin-top: 12px;">
+        <textarea id="batchOutput" rows="8" cols="60" style="font-family: monospace;" readonly placeholder="批量生成的UUID会显示在这里..."></textarea>
+    </div>
+
+    <script>
+        // 生成符合 RFC4122 标准的 UUID (版本4)
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // 更新主输入框内容
+        function updateMainUUID(uuid) {
+            const outputEl = document.getElementById('uuidOutput');
+            if (outputEl) outputEl.value = uuid;
+        }
+
+        // 获取当前主UUID
+        function getCurrentMainUUID() {
+            const el = document.getElementById('uuidOutput');
+            return el ? el.value : '';
+        }
+
+        // 复制到剪贴板
+        async function copyToClipboard(text) {
+            // 优先使用现代 Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    alert('已复制: ' + text);
+                } catch (err) {
+                    fallbackCopy(text);
+                }
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        // 降级复制方法
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                alert('已复制: ' + text);
+            } catch (err) {
+                alert('复制失败，请手动复制');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // 生成新的UUID并更新主显示区
+        function generateAndSet() {
+            const newUUID = generateUUID();
+            updateMainUUID(newUUID);
+            return newUUID;
+        }
+
+        // 批量生成函数
+        function batchGenerate() {
+            const countInput = document.getElementById('batchCount');
+            let count = parseInt(countInput.value, 10);
+            if (isNaN(count) || count < 1) count = 1;
+            if (count > 100) count = 100;
+            
+            const uuids = [];
+            for (let i = 0; i < count; i++) {
+                uuids.push(generateUUID());
+            }
+            const batchOutput = document.getElementById('batchOutput');
+            if (batchOutput) {
+                batchOutput.value = uuids.join('\n');
+            }
+        }
+
+        // 事件绑定与初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const genBtn = document.getElementById('genBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const batchGenBtn = document.getElementById('batchGenBtn');
+            
+            // 初始化生成一个UUID显示
+            generateAndSet();
+            
+            // 生成新UUID按钮
+            if (genBtn) {
+                genBtn.addEventListener('click', function() {
+                    generateAndSet();
+                });
+            }
+            
+            // 复制按钮：复制当前主UUID输入框内的值
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    const currentUUID = getCurrentMainUUID();
+                    if (currentUUID && currentUUID.trim() !== '') {
+                        copyToClipboard(currentUUID);
+                    } else {
+                        alert('没有可复制的UUID，请先生成');
+                    }
+                });
+            }
+            
+            // 批量生成按钮
+            if (batchGenBtn) {
+                batchGenBtn.addEventListener('click', function() {
+                    batchGenerate();
+                });
+            }
+            
+            // 方便: 按回车批量生成数量框触发批量 (可选交互)
+            const batchCountInput = document.getElementById('batchCount');
+            if (batchCountInput) {
+                batchCountInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        batchGenerate();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
